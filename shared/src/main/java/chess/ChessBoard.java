@@ -8,8 +8,23 @@ package chess;
  */
 public class ChessBoard {
 
+    @Override
+    public String toString() {
+        return "ChessBoard{To be implemented}";
+    }
+
     public ChessBoard() {
-        
+
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
     }
 
     /**

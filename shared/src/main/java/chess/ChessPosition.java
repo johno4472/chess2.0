@@ -8,6 +8,16 @@ package chess;
  */
 public class ChessPosition {
 
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+
     public ChessPosition(int row, int col) {
     }
 
@@ -25,5 +35,10 @@ public class ChessPosition {
      */
     public int getColumn() {
         throw new RuntimeException("Not implemented");
+    }
+
+    @Override
+    public String toString() {
+        return "ChessPosition{to be implemented}";
     }
 }
