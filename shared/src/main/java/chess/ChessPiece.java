@@ -85,8 +85,10 @@ public class ChessPiece {
             case QUEEN:
                 appendDiagonalMoves(true, board, myPosition, possibleMoves);
                 appendHorizontalMoves(true, board, myPosition, possibleMoves);
+                break;
             case BISHOP:
                 appendDiagonalMoves(true, board, myPosition, possibleMoves);
+                break;
             case KNIGHT:
                 appendMovesIfValid(false, board, myPosition, possibleMoves, 2, 1);
                 appendMovesIfValid(false, board, myPosition, possibleMoves, 2, -1);
@@ -96,6 +98,10 @@ public class ChessPiece {
                 appendMovesIfValid(false, board, myPosition, possibleMoves, 1, -2);
                 appendMovesIfValid(false, board, myPosition, possibleMoves, -1, -2);
                 appendMovesIfValid(false, board, myPosition, possibleMoves, -1, 2);
+                break;
+            case ROOK:
+                appendHorizontalMoves(true, board, myPosition, possibleMoves);
+
         }
         return possibleMoves;
     }
