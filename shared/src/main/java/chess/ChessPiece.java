@@ -82,6 +82,9 @@ public class ChessPiece {
                 appendDiagonalMoves(false, board, myPosition, possibleMoves);
                 appendHorizontalMoves(false, board, myPosition, possibleMoves);
                 break;
+            case QUEEN:
+                appendDiagonalMoves(true, board, myPosition, possibleMoves);
+                appendHorizontalMoves(true, board, myPosition, possibleMoves);
         }
         return possibleMoves;
     }
