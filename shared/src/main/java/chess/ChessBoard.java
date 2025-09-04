@@ -79,7 +79,8 @@ public class ChessBoard {
     public void resetBoard() {
         board = new ChessPiece[8][8];
         ChessPiece.PieceType[] piecesSetup = {ChessPiece.PieceType.ROOK, ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.BISHOP,
-                ChessPiece.PieceType.QUEEN, ChessPiece.PieceType.KING, ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.ROOK};
+                ChessPiece.PieceType.QUEEN, ChessPiece.PieceType.KING, ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.KNIGHT,
+                ChessPiece.PieceType.ROOK};
 
         for (int i = 0; i < 8; i++) {
             addPiece(new ChessPosition(1, i+1), new ChessPiece(ChessGame.TeamColor.WHITE, piecesSetup[i]));
