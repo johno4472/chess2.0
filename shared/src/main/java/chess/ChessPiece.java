@@ -101,6 +101,7 @@ public class ChessPiece {
                 break;
             case ROOK:
                 appendHorizontalMoves(true, board, myPosition, possibleMoves);
+                break;
             case PAWN:
                 int modifier = 1;
                 int startRow = 2;
