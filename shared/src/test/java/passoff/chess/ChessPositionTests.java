@@ -26,5 +26,4 @@ public class ChessPositionTests extends EqualsTestingUtility<ChessPosition> {
                 new ChessPosition(3, 3)
         );
     }
-
 }
