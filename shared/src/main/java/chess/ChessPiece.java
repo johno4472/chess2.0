@@ -13,12 +13,12 @@ import java.util.Objects;
  */
 public class ChessPiece {
 
-    private ChessGame.TeamColor _pieceColor;
-    private PieceType _type;
+    private ChessGame.TeamColor pieceColor;
+    private PieceType type;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
-        _pieceColor = pieceColor;
-        _type = type;
+        this.pieceColor = pieceColor;
+        this.type = type;
     }
 
     @Override
@@ -27,17 +27,17 @@ public class ChessPiece {
             return false;
         }
         ChessPiece that = (ChessPiece) o;
-        return _pieceColor == that._pieceColor && _type == that._type;
+        return pieceColor == that.pieceColor && type == that.type;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(_pieceColor, _type);
+        return Objects.hash(pieceColor, type);
     }
 
     @Override
     public String toString() {
-        return _pieceColor.toString() + " " + _type.toString();
+        return pieceColor.toString() + " " + type.toString();
     }
 
     /**
@@ -57,7 +57,7 @@ public class ChessPiece {
      */
     public ChessGame.TeamColor getTeamColor() {
 
-        return _pieceColor;
+        return pieceColor;
     }
 
     /**
@@ -65,7 +65,7 @@ public class ChessPiece {
      */
     public PieceType getPieceType() {
 
-        return _type;
+        return type;
     }
 
     /**
@@ -77,7 +77,7 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> possibleMoves = new ArrayList<ChessMove>();
-        switch(_type){
+        switch(type){
             case KING:
                 appendDiagonalMoves(false, board, myPosition, possibleMoves);
                 appendHorizontalMoves(false, board, myPosition, possibleMoves);
@@ -106,7 +106,7 @@ public class ChessPiece {
                 int modifier = 1;
                 int startRow = 2;
                 int endRow = 8;
-                if (_pieceColor == ChessGame.TeamColor.BLACK) {
+                if (pieceColor == ChessGame.TeamColor.BLACK) {
                     modifier = -1;
                     startRow = 7;
                     endRow = 1;
@@ -139,7 +139,8 @@ public class ChessPiece {
         appendMovesIfValid(unlimitedMove, false, board, myPosition, possibleMoves, 0, 1);
     }
 
-    public void appendMovesIfValid(boolean unlimitedMove, boolean promotedPawn, ChessBoard board, ChessPosition myPosition, Collection<ChessMove> possibleMoves, int rowDirection, int columnDirection) {
+    public void appendMovesIfValid(boolean unlimitedMove, boolean promotedPawn, ChessBoard board, ChessPosition myPosition,
+                                   Collection<ChessMove> possibleMoves, int rowDirection, int columnDirection) {
         int row = myPosition.getRow();
         int column = myPosition.getColumn();
         for (int i = 0; i < 8; i++) {
@@ -150,8 +151,8 @@ public class ChessPiece {
             }
             ChessPiece targetSpacePiece = board.getPiece(new ChessPosition(row, column));
             if (targetSpacePiece != null) {
-                if (targetSpacePiece._pieceColor != this._pieceColor) {
-                    if (this._type == PieceType.PAWN && columnDirection == 0) {
+                if (targetSpacePiece.pieceColor != this.pieceColor) {
+                    if (this.type == PieceType.PAWN && columnDirection == 0) {
                         break;
                     }
                     else if (promotedPawn) {
@@ -164,7 +165,7 @@ public class ChessPiece {
                 break;
             }
             else {
-                if (this._type == PieceType.PAWN && Math.abs(columnDirection) == 1) {
+                if (this.type == PieceType.PAWN && Math.abs(columnDirection) == 1) {
                     break;
                 }
                 else if (promotedPawn) {
