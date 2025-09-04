@@ -90,58 +90,99 @@ public class ChessPiece {
                 appendDiagonalMoves(true, board, myPosition, possibleMoves);
                 break;
             case KNIGHT:
-                appendMovesIfValid(false, board, myPosition, possibleMoves, 2, 1);
-                appendMovesIfValid(false, board, myPosition, possibleMoves, 2, -1);
-                appendMovesIfValid(false, board, myPosition, possibleMoves, -2, 1);
-                appendMovesIfValid(false, board, myPosition, possibleMoves, -2, -1);
-                appendMovesIfValid(false, board, myPosition, possibleMoves, 1, 2);
-                appendMovesIfValid(false, board, myPosition, possibleMoves, 1, -2);
-                appendMovesIfValid(false, board, myPosition, possibleMoves, -1, -2);
-                appendMovesIfValid(false, board, myPosition, possibleMoves, -1, 2);
+                appendMovesIfValid(false, false, board, myPosition, possibleMoves, 2, 1);
+                appendMovesIfValid(false, false, board, myPosition, possibleMoves, 2, -1);
+                appendMovesIfValid(false, false, board, myPosition, possibleMoves, -2, 1);
+                appendMovesIfValid(false, false, board, myPosition, possibleMoves, -2, -1);
+                appendMovesIfValid(false, false, board, myPosition, possibleMoves, 1, 2);
+                appendMovesIfValid(false, false, board, myPosition, possibleMoves, 1, -2);
+                appendMovesIfValid(false, false, board, myPosition, possibleMoves, -1, -2);
+                appendMovesIfValid(false, false, board, myPosition, possibleMoves, -1, 2);
                 break;
             case ROOK:
                 appendHorizontalMoves(true, board, myPosition, possibleMoves);
-
+            case PAWN:
+                int modifier = 1;
+                int startRow = 2;
+                int endRow = 8;
+                if (_pieceColor == ChessGame.TeamColor.BLACK) {
+                    modifier = -1;
+                    startRow = 7;
+                    endRow = 1;
+                }
+                if (myPosition.getRow() == startRow && board.getPiece(new ChessPosition(startRow + modifier, myPosition.getColumn())) == null) {
+                    appendMovesIfValid(false, false, board, myPosition, possibleMoves, 2 * modifier, 0);
+                }
+                boolean promotion = false;
+                if (myPosition.getRow() + modifier == endRow) {
+                    promotion = true;
+                }
+                appendMovesIfValid(false, promotion, board, myPosition, possibleMoves, modifier, 0);
+                appendMovesIfValid(false, promotion, board, myPosition, possibleMoves, modifier, -1);
+                appendMovesIfValid(false, promotion, board, myPosition, possibleMoves, modifier, 1);
         }
         return possibleMoves;
     }
 
     public void appendDiagonalMoves(boolean unlimitedMove, ChessBoard board, ChessPosition myPosition, Collection<ChessMove> possibleMoves) {
-        appendMovesIfValid(unlimitedMove, board, myPosition, possibleMoves, -1, -1);
-        appendMovesIfValid(unlimitedMove, board, myPosition, possibleMoves, -1, 1);
-        appendMovesIfValid(unlimitedMove, board, myPosition, possibleMoves, 1, 1);
-        appendMovesIfValid(unlimitedMove, board, myPosition, possibleMoves, 1, -1);
+        appendMovesIfValid(unlimitedMove, false, board, myPosition, possibleMoves, -1, -1);
+        appendMovesIfValid(unlimitedMove, false, board, myPosition, possibleMoves, -1, 1);
+        appendMovesIfValid(unlimitedMove, false, board, myPosition, possibleMoves, 1, 1);
+        appendMovesIfValid(unlimitedMove, false, board, myPosition, possibleMoves, 1, -1);
     }
 
     public void appendHorizontalMoves(boolean unlimitedMove, ChessBoard board, ChessPosition myPosition, Collection<ChessMove> possibleMoves) {
-        appendMovesIfValid(unlimitedMove, board, myPosition, possibleMoves, 1, 0);
-        appendMovesIfValid(unlimitedMove, board, myPosition, possibleMoves, -1, 0);
-        appendMovesIfValid(unlimitedMove, board, myPosition, possibleMoves, 0, -1);
-        appendMovesIfValid(unlimitedMove, board, myPosition, possibleMoves, 0, 1);
+        appendMovesIfValid(unlimitedMove, false, board, myPosition, possibleMoves, 1, 0);
+        appendMovesIfValid(unlimitedMove, false, board, myPosition, possibleMoves, -1, 0);
+        appendMovesIfValid(unlimitedMove, false, board, myPosition, possibleMoves, 0, -1);
+        appendMovesIfValid(unlimitedMove, false, board, myPosition, possibleMoves, 0, 1);
     }
 
-    public void appendMovesIfValid(boolean unlimitedMove, ChessBoard board, ChessPosition myPosition, Collection<ChessMove> possibleMoves, int xDirection, int yDirection) {
+    public void appendMovesIfValid(boolean unlimitedMove, boolean promotedPawn, ChessBoard board, ChessPosition myPosition, Collection<ChessMove> possibleMoves, int rowDirection, int columnDirection) {
         int row = myPosition.getRow();
         int column = myPosition.getColumn();
         for (int i = 0; i < 8; i++) {
-            row += xDirection;
-            column += yDirection;
+            row += rowDirection;
+            column += columnDirection;
             if (row <= 0 || row >= 9 || column <= 0 || column >= 9) {
                 break;
             }
             ChessPiece targetSpacePiece = board.getPiece(new ChessPosition(row, column));
             if (targetSpacePiece != null) {
                 if (targetSpacePiece._pieceColor != this._pieceColor) {
-                    possibleMoves.add(new ChessMove(myPosition, new ChessPosition(row, column), null));
+                    if (this._type == PieceType.PAWN && columnDirection == 0) {
+                        break;
+                    }
+                    else if (promotedPawn) {
+                        addPossibleMovesWithPromotion(myPosition, new ChessPosition(row, column), possibleMoves);
+                    }
+                    else {
+                        possibleMoves.add(new ChessMove(myPosition, new ChessPosition(row, column), null));
+                    }
                 }
                 break;
             }
             else {
-                possibleMoves.add(new ChessMove(myPosition, new ChessPosition(row, column), null));
+                if (this._type == PieceType.PAWN && Math.abs(columnDirection) == 1) {
+                    break;
+                }
+                else if (promotedPawn) {
+                    addPossibleMovesWithPromotion(myPosition, new ChessPosition(row, column), possibleMoves);
+                }
+                else {
+                    possibleMoves.add(new ChessMove(myPosition, new ChessPosition(row, column), null));
+                }
             }
             if (!unlimitedMove) {
                 break;
             }
         }
+    }
+
+    private void addPossibleMovesWithPromotion(ChessPosition myPosition, ChessPosition newPosition, Collection<ChessMove> possibleMoves) {
+        possibleMoves.add(new ChessMove(myPosition, newPosition, PieceType.QUEEN));
+        possibleMoves.add(new ChessMove(myPosition, newPosition, PieceType.ROOK));
+        possibleMoves.add(new ChessMove(myPosition, newPosition, PieceType.BISHOP));
+        possibleMoves.add(new ChessMove(myPosition, newPosition, PieceType.KNIGHT));
     }
 }
