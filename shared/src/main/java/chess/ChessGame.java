@@ -141,14 +141,43 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
         //if king is not in check, return false
-
+        if (!isInCheck(teamColor)) {
+            return false;
+        }
         //for all pieces of team color
-            //if the result of the move is king not being in check, return false
-        //return true
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                ChessPiece square = chessBoard.getPiece(new ChessPosition(i, j));
+                if (square != null && square.getTeamColor() == teamColor) {
+                    //if the result of the move is king not being in check, return false
+                    if (!simulatedGameStaysChecked(new ChessPosition(i, j), square)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
+    private boolean simulatedGameStaysChecked(ChessPosition square, ChessPiece piece) {
+        Collection<ChessMove> potentialMoves = piece.pieceMoves(chessBoard, square);
+        ChessGame simulation;
+        for (ChessMove move : potentialMoves) {
+            simulation = new ChessGame();
+            simulation.chessBoard = this.chessBoard;
+            try {
+                simulation.makeMove(move);
+            }
+            catch (Exception e) {
+                continue;
+            }
+            if (!simulation.isInCheck(piece.getTeamColor())) {
+                return false;
+            }
+        }
+        return true;
+    }
     /**
      * Determines if the given team is in stalemate, which here is defined as having
      * no valid moves while not in check.
@@ -157,13 +186,18 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
-        //for each piece of teamColor
-            //if there is a valid move
-                //return false
-        //if not in check
-            //return true
-        //return false
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                ChessPiece square = chessBoard.getPiece(new ChessPosition(i, j));
+                if (square != null && square.getTeamColor() == teamColor) {
+                    Collection<ChessMove> validMoves = this.validMoves(new ChessPosition(i, j));
+                    if (!validMoves.isEmpty()) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     /**
