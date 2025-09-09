@@ -85,11 +85,12 @@ public class ChessGame {
     public void doMoveWithoutChecking(ChessMove move) {
         ChessPiece piece = chessBoard.getPiece(move.getStartPosition());
         ChessPiece.PieceType pieceType = piece.getPieceType();
+        TeamColor color  = piece.getTeamColor();
         if (move.getPromotionPiece() != null) {
             pieceType = move.getPromotionPiece();
         }
         chessBoard.addPiece(move.getStartPosition(), null);
-        chessBoard.addPiece(move.getEndPosition(), new ChessPiece(teamTurn, pieceType));
+        chessBoard.addPiece(move.getEndPosition(), new ChessPiece(color, pieceType));
     }
 
     public void makeMove(ChessMove move) throws InvalidMoveException {
