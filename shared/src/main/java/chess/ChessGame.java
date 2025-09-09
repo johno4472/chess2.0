@@ -88,7 +88,7 @@ public class ChessGame {
             }
         }
         //return move where king moves two toward rook and rook goes on other side of king
-        castleMove.add(new ChessMove(kingPosition, new ChessPosition(kingPosition.getRow(), kingPosition.getColumn() - (2 * modifier)), null));
+        castleMove.add(new ChessMove(kingPosition, new ChessPosition(kingPosition.getRow(), kingPosition.getColumn() + (2 * modifier)), null));
     }
 
     private Collection<ChessMove> validCastlingMove(ChessPosition startPosition) {
@@ -135,13 +135,14 @@ public class ChessGame {
      */
     public void doMoveWithoutChecking(ChessMove move) {
         ChessPiece piece = chessBoard.getPiece(move.getStartPosition());
+        Boolean hasMoved = piece.getHasMoved();
         ChessPiece.PieceType pieceType = piece.getPieceType();
         TeamColor color  = piece.getTeamColor();
         if (move.getPromotionPiece() != null) {
-            pieceType = move.getPromotionPiece();
+            piece.changePieceType(move.getPromotionPiece());
         }
         chessBoard.addPiece(move.getStartPosition(), null);
-        chessBoard.addPiece(move.getEndPosition(), new ChessPiece(color, pieceType));
+        chessBoard.addPiece(move.getEndPosition(), piece);
     }
 
     public void makeMove(ChessMove move) throws InvalidMoveException {

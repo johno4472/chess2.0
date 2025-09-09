@@ -47,7 +47,9 @@ public class ChessPiece {
     }
 
     public void moved() {
-        hasMoved = true;
+        if (!hasMoved) {
+            hasMoved = true;
+        }
     }
 
     /**
@@ -66,7 +68,6 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-
         return pieceColor;
     }
 
@@ -74,8 +75,11 @@ public class ChessPiece {
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-
         return type;
+    }
+
+    public void changePieceType(PieceType newType) {
+        this.type = newType;
     }
 
     /**
