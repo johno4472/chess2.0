@@ -124,6 +124,9 @@ public class ChessGame {
                 validPieceMoves.addAll(castleMove);
             }
         }
+
+        //if piece is pawn and en passant is true
+            //add en passant move to validMoves (current row + enpassant column)
         return validPieceMoves;
     }
 
@@ -145,11 +148,19 @@ public class ChessGame {
         chessBoard.addPiece(move.getEndPosition(), piece);
     }
 
+    public Boolean enPassant() {
+        //take position of pawn that moved two
+        //is there a pawn to the left or right of it?
+            //if so, mark that pawn as En Passant -> true and column of pawn that can be killed
+    }
+
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPiece piece = chessBoard.getPiece(move.getStartPosition());
         if (validMoves(move.getStartPosition()).contains(move) && piece.getTeamColor() == teamTurn) {
             doMoveWithoutChecking(move);
             piece.moved();
+            //if piece is pawn
+                //and move was 2, do En Passant method
             if (piece.getPieceType() == ChessPiece.PieceType.KING && Math.abs(move.getStartPosition().getColumn() - move.getEndPosition().getColumn()) == 2) {
                 int rookStartColumn = 8;
                 int rookEndColumn = 6;
