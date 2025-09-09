@@ -94,7 +94,7 @@ public class ChessGame {
     private Collection<ChessMove> validCastlingMove(ChessPosition startPosition) {
         Collection<ChessMove> castleMove = new ArrayList<ChessMove>();
         //check if king has moved
-        if (chessBoard.getPiece(startPosition).getHasMoved()) {
+        if (chessBoard.getPiece(startPosition).getHasMoved() || isInCheck(chessBoard.getPiece(startPosition).getTeamColor())) {
             return castleMove;
         }
         int kingRow = startPosition.getRow();
