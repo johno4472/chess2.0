@@ -96,6 +96,7 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         if (validMoves(move.getStartPosition()).contains(move) && chessBoard.getPiece(move.getStartPosition()).getTeamColor() == teamTurn) {
             doMoveWithoutChecking(move);
+            teamTurn = otherTeam(teamTurn);
         }
         else {
             throw new InvalidMoveException();
