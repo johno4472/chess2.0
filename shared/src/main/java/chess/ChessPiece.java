@@ -15,10 +15,12 @@ public class ChessPiece {
 
     private ChessGame.TeamColor pieceColor;
     private PieceType type;
+    private Boolean hasMoved;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
+        this.hasMoved = false;
     }
 
     @Override
@@ -38,6 +40,14 @@ public class ChessPiece {
     @Override
     public String toString() {
         return pieceColor.toString() + " " + type.toString();
+    }
+
+    public Boolean getHasMoved() {
+        return hasMoved;
+    }
+
+    public void moved() {
+        hasMoved = true;
     }
 
     /**

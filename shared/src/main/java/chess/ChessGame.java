@@ -1,6 +1,7 @@
 package chess;
 
 import java.io.Console;
+import java.text.CollationElementIterator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
@@ -63,6 +64,49 @@ public class ChessGame {
      * @return Set of valid moves for requested piece, or null if no piece at
      * startPosition
      */
+    private void addSpecificCastleMoveIfValid(ChessPosition rookPosition, ChessPosition kingPosition, Collection<ChessMove> castleMove) {
+        //check if rookPosition has rook and if rook has moved
+        ChessPiece rook = chessBoard.getPiece(rookPosition);
+        ChessPiece king = chessBoard.getPiece(kingPosition);
+        if (rook == null || rook.getHasMoved() == true) {
+            return;
+        }
+        int modifier = 1;
+        if (kingPosition.getColumn() - rookPosition.getColumn() > 0) {
+            modifier = -1;
+        }
+        //check if spaces empty between them
+        //check if king moving once or twice will put him in check
+        for (int i = 1; i < (Math.abs(rookPosition.getColumn() - kingPosition.getColumn())); i++) {
+            int newColumn = kingPosition.getColumn() + (i * modifier);
+            ChessPosition targetSquare = new ChessPosition(kingPosition.getRow(), newColumn);
+            if (chessBoard.getPiece(targetSquare) != null) {
+                return;
+            }
+            if (simulatedMoveResultsInCheck(new ChessMove(kingPosition, targetSquare, null), king)) {
+                return;
+            }
+        }
+        //return move where king moves two toward rook and rook goes on other side of king
+        castleMove.add(new ChessMove(kingPosition, new ChessPosition(kingPosition.getRow(), kingPosition.getColumn() - (2 * modifier)), null));
+    }
+
+    private Collection<ChessMove> validCastlingMove(ChessPosition startPosition) {
+        Collection<ChessMove> castleMove = new ArrayList<ChessMove>();
+        //check if king has moved
+        if (chessBoard.getPiece(startPosition).getHasMoved()) {
+            return castleMove;
+        }
+        int kingRow = startPosition.getRow();
+        //call addSpecific castle move for left
+        addSpecificCastleMoveIfValid(new ChessPosition(kingRow, 1), startPosition, castleMove);
+        //call add specific castle move for right
+        addSpecificCastleMoveIfValid(new ChessPosition(kingRow, 8), startPosition, castleMove);
+
+        return castleMove;
+    }
+
+
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         Collection<ChessMove> validPieceMoves = new ArrayList<ChessMove>();
         if (chessBoard.getPiece(startPosition) == null) {
@@ -72,6 +116,12 @@ public class ChessGame {
         for (ChessMove move : pieceMoves) {
             if (!simulatedMoveResultsInCheck(move, chessBoard.getPiece(startPosition))) {
                 validPieceMoves.add(move);
+            }
+        }
+        if (chessBoard.getPiece(startPosition).getPieceType() == ChessPiece.PieceType.KING) {
+            Collection<ChessMove> castleMove = validCastlingMove(startPosition);
+            if (!castleMove.isEmpty()) {
+                validPieceMoves.addAll(castleMove);
             }
         }
         return validPieceMoves;
@@ -95,8 +145,20 @@ public class ChessGame {
     }
 
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        if (validMoves(move.getStartPosition()).contains(move) && chessBoard.getPiece(move.getStartPosition()).getTeamColor() == teamTurn) {
+        ChessPiece piece = chessBoard.getPiece(move.getStartPosition());
+        if (validMoves(move.getStartPosition()).contains(move) && piece.getTeamColor() == teamTurn) {
             doMoveWithoutChecking(move);
+            piece.moved();
+            if (piece.getPieceType() == ChessPiece.PieceType.KING && Math.abs(move.getStartPosition().getColumn() - move.getEndPosition().getColumn()) == 2) {
+                int rookStartColumn = 8;
+                int rookEndColumn = 6;
+                int rookRow = move.getStartPosition().getRow();
+                if (move.getStartPosition().getColumn() > move.getEndPosition().getColumn()) {
+                    rookStartColumn = 1;
+                    rookEndColumn = 4;
+                }
+                doMoveWithoutChecking(new ChessMove(new ChessPosition(rookRow, rookStartColumn), new ChessPosition(rookRow, rookEndColumn), null));
+            }
             teamTurn = otherTeam(teamTurn);
         }
         else {
