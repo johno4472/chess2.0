@@ -16,11 +16,14 @@ public class ChessPiece {
     private ChessGame.TeamColor pieceColor;
     private PieceType type;
     private Boolean hasMoved;
+    private Boolean enPassant;
+    private ChessMove enPassantMove;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
         this.hasMoved = false;
+        this.enPassant = false;
     }
 
     @Override
@@ -50,6 +53,22 @@ public class ChessPiece {
         if (!hasMoved) {
             hasMoved = true;
         }
+    }
+
+    public Boolean getEnPassant() {
+        return enPassant;
+    }
+
+    public void setEnPassant(Boolean factor){
+        enPassant = factor;
+    }
+
+    public void setEnPassantMove(ChessMove move) {
+        enPassantMove = move;
+    }
+
+    public ChessMove getEnPassantMove() {
+        return enPassantMove;
     }
 
     /**

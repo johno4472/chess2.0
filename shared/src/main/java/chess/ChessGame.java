@@ -109,20 +109,25 @@ public class ChessGame {
 
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         Collection<ChessMove> validPieceMoves = new ArrayList<ChessMove>();
-        if (chessBoard.getPiece(startPosition) == null) {
+        ChessPiece piece = chessBoard.getPiece(startPosition);
+        if (piece == null) {
             return validPieceMoves;
         }
-        Collection<ChessMove> pieceMoves = chessBoard.getPiece(startPosition).pieceMoves(chessBoard, startPosition);
+        Collection<ChessMove> pieceMoves = piece.pieceMoves(chessBoard, startPosition);
         for (ChessMove move : pieceMoves) {
-            if (!simulatedMoveResultsInCheck(move, chessBoard.getPiece(startPosition))) {
+            if (!simulatedMoveResultsInCheck(move, piece)) {
                 validPieceMoves.add(move);
             }
         }
-        if (chessBoard.getPiece(startPosition).getPieceType() == ChessPiece.PieceType.KING) {
+        if (piece.getPieceType() == ChessPiece.PieceType.KING) {
             Collection<ChessMove> castleMove = validCastlingMove(startPosition);
             if (!castleMove.isEmpty()) {
                 validPieceMoves.addAll(castleMove);
             }
+        }
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN && piece.getEnPassant()) {
+            validPieceMoves.add(piece.getEnPassantMove());
+            piece.setEnPassant(false);
         }
 
         //if piece is pawn and en passant is true
@@ -148,9 +153,23 @@ public class ChessGame {
         chessBoard.addPiece(move.getEndPosition(), piece);
     }
 
-    public Boolean enPassant() {
+    public void enPassant(ChessPosition pawnSpot, int colDirection) {
         //take position of pawn that moved two
         //is there a pawn to the left or right of it?
+        int row = pawnSpot.getRow();
+        int col = pawnSpot.getColumn();
+        if (col + colDirection > 0 && col + colDirection < 9) {
+            ChessPosition neighborPosition = new ChessPosition(row, pawnSpot.getColumn() - colDirection);
+            ChessPiece neighbor = chessBoard.getPiece(neighborPosition);
+            if (neighbor != null && neighbor.getPieceType() == ChessPiece.PieceType.PAWN && neighbor.getTeamColor() != chessBoard.getPiece(pawnSpot).getTeamColor()) {
+                neighbor.setEnPassant(true);
+                int rowDirection = 1;
+                if (neighbor.getTeamColor() == TeamColor.BLACK) {
+                    rowDirection = -1;
+                }
+                neighbor.setEnPassantMove(new ChessMove(neighborPosition, new ChessPosition(neighborPosition.getRow() + rowDirection, neighborPosition.getColumn() + colDirection), null));
+            }
+        }
             //if so, mark that pawn as En Passant -> true and column of pawn that can be killed
     }
 
@@ -160,6 +179,15 @@ public class ChessGame {
             doMoveWithoutChecking(move);
             piece.moved();
             //if piece is pawn
+            if (piece.getPieceType() == ChessPiece.PieceType.PAWN && piece.getEnPassantMove() == move) {
+                ChessPosition enemyPosition = new ChessPosition(move.getStartPosition().getRow(), move.getEndPosition().getColumn());
+                chessBoard.addPiece(enemyPosition, null);
+            }
+            int colDifference = Math.abs(move.getStartPosition().getColumn() - move.getEndPosition().getColumn());
+            if (piece.getPieceType() == ChessPiece.PieceType.PAWN && colDifference == 2) {
+                enPassant(move.getEndPosition(), -1);
+                enPassant(move.getEndPosition(), 1);
+            }
                 //and move was 2, do En Passant method
             if (piece.getPieceType() == ChessPiece.PieceType.KING && Math.abs(move.getStartPosition().getColumn() - move.getEndPosition().getColumn()) == 2) {
                 int rookStartColumn = 8;
