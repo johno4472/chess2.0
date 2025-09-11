@@ -16,11 +16,13 @@ public class ChessGame {
 
     private TeamColor teamTurn;
     private ChessBoard chessBoard;
+    private Collection<ChessPiece> enPassantPieces;
 
     public ChessGame() {
         teamTurn = TeamColor.WHITE;
         chessBoard = new ChessBoard();
         chessBoard.resetBoard();
+        enPassantPieces = new ArrayList<>();
     }
 
     /**
@@ -127,7 +129,6 @@ public class ChessGame {
         }
         if (piece.getPieceType() == ChessPiece.PieceType.PAWN && piece.getEnPassant()) {
             validPieceMoves.add(piece.getEnPassantMove());
-            piece.setEnPassant(false);
         }
 
         //if piece is pawn and en passant is true
@@ -168,23 +169,41 @@ public class ChessGame {
                     rowDirection = -1;
                 }
                 neighbor.setEnPassantMove(new ChessMove(neighborPosition, new ChessPosition(neighborPosition.getRow() + rowDirection, neighborPosition.getColumn() + colDirection), null));
+                enPassantPieces.add(neighbor);
             }
         }
             //if so, mark that pawn as En Passant -> true and column of pawn that can be killed
     }
 
+    private void removeEnPassantPieces() {
+        if (enPassantPieces.isEmpty()) {
+            return;
+        }
+        Collection<ChessPiece> toRemove = new ArrayList<>();
+        for (ChessPiece piece: enPassantPieces) {
+            if (piece.getTeamColor() != teamTurn) {
+                piece.setEnPassant(false);
+                piece.setEnPassantMove(null);
+                toRemove.add(piece);
+            }
+        }
+        enPassantPieces.removeAll(toRemove);
+    }
+
+
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPiece piece = chessBoard.getPiece(move.getStartPosition());
+        removeEnPassantPieces();
         if (validMoves(move.getStartPosition()).contains(move) && piece.getTeamColor() == teamTurn) {
             doMoveWithoutChecking(move);
             piece.moved();
             //if piece is pawn
-            if (piece.getPieceType() == ChessPiece.PieceType.PAWN && piece.getEnPassantMove() == move) {
+            if (piece.getPieceType() == ChessPiece.PieceType.PAWN && (move.equals(piece.getEnPassantMove()))) {
                 ChessPosition enemyPosition = new ChessPosition(move.getStartPosition().getRow(), move.getEndPosition().getColumn());
                 chessBoard.addPiece(enemyPosition, null);
             }
-            int colDifference = Math.abs(move.getStartPosition().getColumn() - move.getEndPosition().getColumn());
-            if (piece.getPieceType() == ChessPiece.PieceType.PAWN && colDifference == 2) {
+            int rowDifference = Math.abs(move.getStartPosition().getRow() - move.getEndPosition().getRow());
+            if (piece.getPieceType() == ChessPiece.PieceType.PAWN && rowDifference == 2) {
                 enPassant(move.getEndPosition(), -1);
                 enPassant(move.getEndPosition(), 1);
             }
